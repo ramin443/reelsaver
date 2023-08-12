@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "674829294378",
+    "project_id": "reelsaver-e3125",
+    "storage_bucket": "reelsaver-e3125.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:674829294378:android:3aee9f4a890b586821dc53",
+        "android_client_info": {
+          "package_name": "com.reelsviddownloader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "674829294378-2bchteepbcp1rh5i7f0dmj7r04pv7pq4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.reelsviddownloader",
+            "certificate_hash": "d1f4c39c97e57a697d2c4de5a6fa903a2b9f84bf"
+          }
+        },
+        {
+          "client_id": "674829294378-tlffnj7a6ng9a4bomlp8h6afb6lhljp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0Awe5lpk8Q8Deqc73n2yDZX_e-00EeIk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "674829294378-tlffnj7a6ng9a4bomlp8h6afb6lhljp4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
