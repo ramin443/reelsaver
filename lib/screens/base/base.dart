@@ -39,10 +39,19 @@ class Base extends StatelessWidget {
               backgroundColor: Colors.transparent,
               centerTitle: false,
               actions: [
+                IconButton(onPressed: (){
+                  homeController.printalltasks();
+                },
+                    icon: Icon(FeatherIcons.cloud,
+                color: Colors.black,
+                size: 20,)),
                 IconButton(
                     onPressed: () {
-                      homeController.parseResponsetoOutput(sampleResponsefromreels);
-                      homeController.testdownload();
+//                      homeController.testdownload();
+
+
+
+                      //     homeController.parseResponsetoOutput(sampleResponsefromreels);
                      /* Map<String, dynamic> parsedJson = json.decode(sampleResponsefromreels);
                       ApiResponse response = ApiResponse.fromJson(parsedJson);
                       print("Post Type: ${response.postType}");

@@ -49,11 +49,11 @@ dependencies:
   cloud_firestore: ^4.8.4
   firebase_analytics: ^10.4.4
   shared_preferences: ^2.2.0
-  flutter_file_downloader: ^1.1.2
   firebase_database: ^10.2.4
   dio: ^5.3.2
   video_player: ^2.7.0
   audio_video_progress_bar: ^1.0.1
+  background_downloader: ^7.9.1
 
 
 

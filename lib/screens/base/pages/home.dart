@@ -40,6 +40,7 @@ class Home extends StatelessWidget {
                 ],
               ),
               */
+          //    homecontroller.downloadProgressBar(context),
               homecontroller.homeMainColumn(context),
 
             ],

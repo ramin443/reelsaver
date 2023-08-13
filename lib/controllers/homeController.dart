@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:background_downloader/background_downloader.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:dio/dio.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -35,32 +36,49 @@ class HomeController extends GetxController {
       DownloadedVidDatabaseHelper();
   ApiResponse? receivedResponse;
   Media? receivedMedia;
-  bool isLoading=false;
+  bool isLoading = false;
+
   //the following are parsing controls
   bool isLinkValid = false;
   bool errorThrown = false;
+  int downloadProgress = 0;
   late TargetPlatform? platform;
+  String? localPath = '';
 
   //the following includes the functional code for parsing control
+  void setdownloadProgress(int progress) {
+    print("Setting progress $progress");
+    downloadProgress = progress;
+    update();
+  }
+
+  void resetDownloadingProgress() {
+    downloadProgress = 0;
+    update();
+  }
+
   void setlinkvalidastrue() {
     isLinkValid = true;
     update();
   }
-  void setloadingtrue(){
-    isLoading=true;
-    update();
-  }
-  void setloadingfalse(){
-    isLoading=false;
+
+  void setloadingtrue() {
+    isLoading = true;
     update();
   }
 
-  void seterrorthrowntrue(){
-    errorThrown=true;
+  void setloadingfalse() {
+    isLoading = false;
     update();
   }
-  void seterrorthrownfalse(){
-    errorThrown=false;
+
+  void seterrorthrowntrue() {
+    errorThrown = true;
+    update();
+  }
+
+  void seterrorthrownfalse() {
+    errorThrown = false;
     update();
   }
 
@@ -70,8 +88,9 @@ class HomeController extends GetxController {
   }
 
   void parseResponsetoOutput(String responsebody) {
-   // String finalpurestring = sampleResponsefromreels.replaceAll(RegExp(r'[^\x00-\x7F]+'), '');
-    String finalpurestring = responsebody.replaceAll(RegExp(r'[\x00-\x1F]'), '');
+    // String finalpurestring = sampleResponsefromreels.replaceAll(RegExp(r'[^\x00-\x7F]+'), '');
+    String finalpurestring =
+        responsebody.replaceAll(RegExp(r'[\x00-\x1F]'), '');
     Map<String, dynamic> parsedJson = json.decode(finalpurestring);
     ApiResponse response = ApiResponse.fromJson(parsedJson);
     print("Post Type: ${response.postType}");
@@ -89,11 +108,13 @@ class HomeController extends GetxController {
   }
 
   //download functions
-  void testdownload()async{
-    String forcedurl="https://instagram.fppg1-1.fna.fbcdn.net/v/t66.30100-16/53905490_847286777011273_1522532917070693776_n.mp4?_nc_ht=instagram.fppg1-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=baAHlPPFljkAX8dpuz_&edm=APfKNqwBAAAA&ccb=7-5&oh=00_AfBBlvtum7R88yAwNvCC-qjocoa-0x0jRoBO4QCRDOlrHg&oe=64D38788&_nc_sid=721f0c";
+  void testdownload(String downloadurl) async {
+    String forcedurl =
+        "https://instagram.fppg1-1.fna.fbcdn.net/v/t66.30100-16/53905490_847286777011273_1522532917070693776_n.mp4?_nc_ht=instagram.fppg1-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=baAHlPPFljkAX8dpuz_&edm=APfKNqwBAAAA&ccb=7-5&oh=00_AfBBlvtum7R88yAwNvCC-qjocoa-0x0jRoBO4QCRDOlrHg&oe=64D38788&_nc_sid=721f0c";
     bool permissionReady = await _checkPermission();
     if (permissionReady) {
-    //  await _prepareSaveDir();
+      await _prepareSaveDir();
+      //  await _prepareSaveDir();
       print("Downloading");
 
       try {
@@ -111,16 +132,15 @@ class HomeController extends GetxController {
               print('DOWNLOAD ERROR: $error');
             });
         FileDownloader.setLogEnabled(true);*/
-        downloadVideo(forcedurl);
+        downloadtestvideo(downloadurl);
 
         //     print("Download Completed.");
       } catch (e) {
         print("Download Failed.\n\n" + e.toString());
       }
     }
-
-
   }
+
   Future<void> downloadVideo(String videoUrl) async {
     Dio dio = Dio();
 
@@ -137,6 +157,7 @@ class HomeController extends GetxController {
       print('Error downloading video: $error');
     }
   }
+
   Future<bool> _checkPermission() async {
     if (Platform.isAndroid) {
       platform = TargetPlatform.android;
@@ -169,7 +190,7 @@ class HomeController extends GetxController {
         decoration: BoxDecoration(
           //  color: Color(0xffFAFAFA).withOpacity(0.52),
           borderRadius: BorderRadius.all(Radius.circular(11)),
-        //  border: Border.all(color: Color(0xff707070).withOpacity(0.2), width: 1),
+          //  border: Border.all(color: Color(0xff707070).withOpacity(0.2), width: 1),
         ),
         child: Stack(
           children: [
@@ -191,17 +212,17 @@ class HomeController extends GetxController {
               width: screenwidth * 0.837,
               height: screenwidth * 0.841,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(11)),
-                gradient: LinearGradient(
-                  colors: [Colors.black12, Colors.black],
-                  stops: [0.1,1],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-              ),
+                  borderRadius: BorderRadius.all(Radius.circular(11)),
+                  gradient: LinearGradient(
+                    colors: [Colors.black12, Colors.black],
+                    stops: [0.1, 1],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  )),
             ),
             Container(
               width: screenwidth * 0.837,
+
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -210,24 +231,29 @@ class HomeController extends GetxController {
                     height: 35,
                   ),
                   Expanded(
-                    child:IconButton(
-                    onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)
-                      =>VideoPlayPage(url: receivedMedia!.url)));
-                    },
-                      icon: Icon(CupertinoIcons.play_fill,
-                      color: Colors.white,
-                      size: 60,),
-                  ),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    VideoPlayPage(url: receivedMedia!.url)));
+                      },
+                      icon: Icon(
+                        CupertinoIcons.play_fill,
+                        color: Colors.white,
+                        size: 60,
+                      ),
+                    ),
                   ),
                   Container(
                     padding: EdgeInsets.only(
                       //        left: 12
-                        left: screenwidth * 0.0351,
+                      left: screenwidth * 0.0351,
                       right: screenwidth * 0.0351,
                     ),
                     margin: EdgeInsets.only(
-                      //        left: 12
+                        //        left: 12
                         bottom: screenwidth * 0.0291),
                     child: Text(
                       receivedResponse!.caption!,
@@ -240,47 +266,164 @@ class HomeController extends GetxController {
                           fontSize: screenwidth * 0.03),
                     ),
                   ),
-                  downloadbutton(context),
+                  downloadProgress>0 &&  downloadProgress<100?
+                  downloadProgressBar(context):
+                  downloadProgress==0?
+                  downloadbutton(context):
+                  downloadProgress==100?
+                  openVideoButton(context):
+                  downloadbutton(context)
+                 ,
                 ],
               ),
             ),
           ],
         ));
   }
-  Widget downloadbutton(BuildContext context){
+
+  Widget downloadProgressBar(BuildContext context) {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return Container(
-      margin: EdgeInsets.only(bottom: screenwidth*0.0634),
-      width: screenwidth*0.715,
-      height: screenwidth*0.107,
-      decoration: BoxDecoration(
-        color: royalbluethemedcolor,
-        borderRadius: BorderRadius.all(Radius.circular(26)),
-      ),
-      child: Row(
+      height: 6,
+      width: screenwidth * 0.715,
+      margin: EdgeInsets.only(bottom: screenwidth * 0.0634),
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            FeatherIcons.download,
-            //      size: 20,
-            size: screenwidth * 0.0426,
-            color: Colors.white,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                margin: EdgeInsets.only(
+                  //        left: 12
+                    left: screenwidth * 0.0291),
+                child: Text(
+                  "Downloading....",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontFamily: proximanovaregular,
+                      color: Colors.white,
+                      //    fontSize: 14.5
+                      fontSize: screenwidth * 0.034),
+                ),
+              ),
+              Container(
+                child: Text(
+                  "$downloadProgress%",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontFamily: proximanovaregular,
+                      color: Colors.white,
+                      //    fontSize: 14.5
+                      fontSize: screenwidth * 0.034),
+                ),
+              ),
+            ],
           ),
-          Container(
-            margin: EdgeInsets.only(
-              //        left: 12
-                left: screenwidth * 0.0291),
-            child: Text(
-              "Download",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: proximanovaregular,
-                  color: Colors.white,
-                  //    fontSize: 14.5
-                  fontSize: screenwidth * 0.041),
+          SizedBox(
+            height: 12,
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            child: LinearProgressIndicator(
+              semanticsLabel: downloadProgress.toString(),
+              value: downloadProgress / 100,
+              // Convert the progress to a value between 0 and 1
+              backgroundColor: Colors.white54,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  royalbluethemedcolor), // Change this color as needed
             ),
-          ),
+          )
         ],
+      ),
+    );
+  }
+
+  Widget openVideoButton(BuildContext context) {
+    double screenwidth = MediaQuery.sizeOf(context).width;
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    VideoPlayPage(url: receivedMedia!.url)));
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: screenwidth * 0.0634),
+        width: screenwidth * 0.715,
+        height: screenwidth * 0.107,
+        decoration: BoxDecoration(
+          color: royalbluethemedcolor,
+          borderRadius: BorderRadius.all(Radius.circular(26)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              FeatherIcons.download,
+              //      size: 20,
+              size: screenwidth * 0.0426,
+              color: Colors.white,
+            ),
+            Container(
+              margin: EdgeInsets.only(
+                //        left: 12
+                  left: screenwidth * 0.0291),
+              child: Text(
+                "Open Video",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: proximanovaregular,
+                    color: Colors.white,
+                    //    fontSize: 14.5
+                    fontSize: screenwidth * 0.041),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget downloadbutton(BuildContext context) {
+    double screenwidth = MediaQuery.sizeOf(context).width;
+    return GestureDetector(
+      onTap: (){
+        testdownload(receivedMedia!.url);
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: screenwidth * 0.0634),
+        width: screenwidth * 0.715,
+        height: screenwidth * 0.107,
+        decoration: BoxDecoration(
+          color: royalbluethemedcolor,
+          borderRadius: BorderRadius.all(Radius.circular(26)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              FeatherIcons.download,
+              //      size: 20,
+              size: screenwidth * 0.0426,
+              color: Colors.white,
+            ),
+            Container(
+              margin: EdgeInsets.only(
+                  //        left: 12
+                  left: screenwidth * 0.0291),
+              child: Text(
+                "Download",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: proximanovaregular,
+                    color: Colors.white,
+                    //    fontSize: 14.5
+                    fontSize: screenwidth * 0.041),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -341,24 +484,6 @@ class HomeController extends GetxController {
     }
   }
 
-  void updateListView() {
-    final Future<Database> dbFuture =
-        downloadedVidDatabaseHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<DownloadedVideo>> noteListFuture =
-          downloadedVidDatabaseHelper.getNoteList();
-      noteListFuture.then((noteList) {
-        this.tasklist = noteList;
-        this.count = noteList.length;
-        update();
-      });
-    });
-//    for(int i=0;i<=tasklist.length-1;i++){
-    //    print("Video length"+tasklist.length.toString());
-    //  print("Video image: "+tasklist[i].videothumbnailurl.toString());
-    //   }
-  }
-
   emptyeverything(BuildContext context) {
     extractedlink = "";
     showdownload = 0;
@@ -410,17 +535,18 @@ class HomeController extends GetxController {
 
                   :
               */
-    /*  receivedMedia != null
+      /*  receivedMedia != null
           ? videopage(context)
           : SizedBox(
               height: 0,
             ),*/
-      errorThrown?ErrorBox():
-        isLinkValid?
-          receivedMedia!=null && isLoading==false?
-              videopage(context):
-          FetchingDownloadsInfo():
-          nolinkpasted(context),
+      errorThrown
+          ? ErrorBox()
+          : isLinkValid
+              ? receivedMedia != null && isLoading == false
+                  ? videopage(context)
+                  : FetchingDownloadsInfo()
+              : nolinkpasted(context),
     ]);
   }
 
@@ -612,4 +738,126 @@ class HomeController extends GetxController {
       ),
     );
   }
+
+  void checkPermissionandDownload() async {
+    var status = await Permission.storage.status;
+    if (status.isGranted) {
+      print("Permissionn is denied");
+    } else {
+      await Permission.storage.request();
+    }
+  }
+
+  Future<void> _prepareSaveDir() async {
+    localPath = (await _findLocalPath());
+
+    final savedDir = Directory(localPath!);
+    bool hasExisted = await savedDir.exists();
+    if (!hasExisted) {
+      savedDir.create();
+    }
+  }
+
+  Future<String> _findLocalPath() async {
+    final directory = Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
+    return directory!.path;
+  }
+
+  void downloadtestvideo(String url) async {
+    String videoUrl = url;
+        String forcedurl="https://z-p4-instagram.fsgn5-12.fna.fbcdn.net/v/t66.30100-16/318229749_938006627283968_4480891006851727740_n.mp4?_nc_ht=z-p4-instagram.fsgn5-12.fna.fbcdn.net&_nc_cat=108&_nc_ohc=MngP_LvlbmwAX85qlPG&edm=APfKNqwBAAAA&ccb=7-5&oh=00_AfDuGAHuKPPribFmiOU-tyjutyHtOsZ1XDA-Aip3Vk7lNQ&oe=64D8FEDE&_nc_sid=721f0c";
+    String caption =
+        "Save THIS\u2705\ud83d\udccc\n\nThese are my all time favorite cookies. \n\nNot only do they taste amazing, one cookie packs a punch filling you up nicely.\n\nI must warn you it tastes bland first time around given that there\u2019s no sugar added (except honey). \n\nYou\u2019re more than welcome to play with honey serving, as well as other natural sweeteners like Stevia. \n\nFull instructions & recipe below:\n\n-You will need: \n\n8 eggs\n1 cup of oats\n7 heaping tablespoons of peanut butter\nTeaspoon of honey\nTeaspoon of vanilla extract\n5 scoops of protein of your choice (I use Isopure vanilla flavored)\n1 banana\n2 scoops of Casein Protein of your choice (I use Optimum Nutrition)\n\n-Preheat oven to 425 degrees Fahrenheit. \n\nWhen placing cookies on baking tray:\nOne tablespoon = 1 cookie.\n\nPlace cookies into the baking tray. Make sure to spray the baking sheet with non-stick cooking oil spray!\n\nSet timer for 9 minutes. \n\nAnd voila! \n\nTotal cookies: 22\n\nOverall Macros:\nFat: 159g\nCarbs: 98g\nProtein: 257g\n\nMacros per cookie: \nProtein: 12g\nFat: 7g\nCarbs: 4g\n\n*I recommend storing them in a fridge.\n\nFollow @rishandfit for more fitness content\ud83e\uddbe\n\n\u2022\n\u2022\n\u2022\n\n#fyp #fyp\u30b7 #foru #explore #fitness #gym #gymaddict #healthylifestyle #proteinrecipes #healthyliving #bodypositivity #fit #fitfam #fitnessaddict #fitnessjourney #fitnessmotivation #reels #explorepage";
+    String finalpurestring = caption.replaceAll(RegExp(r'[\x00-\x1F]'), '');
+
+    if (finalpurestring.length > 14) {
+      finalpurestring = finalpurestring.substring(0, 14);
+    } else {
+      finalpurestring = finalpurestring;
+    }
+    update();
+
+    final Directory? externalDir = await getExternalStorageDirectory();
+    String externalStoragePath = externalDir!.path + '/' + finalpurestring;
+    String randomUniqueString=generateRandomString(4);
+    String filename=randomUniqueString;
+    String reccaption =receivedResponse!.caption;
+    if(reccaption.length>25){
+      filename="${reccaption.substring(0,24)}$randomUniqueString.mp4";
+    }else{
+      filename="$reccaption$randomUniqueString.mp4";
+    }
+
+    final task = DownloadTask(
+        url: videoUrl,
+        // urlQueryParameters: {'q': 'pizza'},
+//        filename: "finalpurestring.mp4",
+        filename: filename,
+        headers: {"auth": "test_for_sql_encoding"},
+        directory: "DownloadedVideos",
+        baseDirectory: BaseDirectory.applicationDocuments,
+        updates: Updates.statusAndProgress,
+        // request status and progress updates
+        requiresWiFi: true,
+        retries: 5,
+        allowPause: true,
+        metaData: 'data for me');
+
+// Start download, and wait for result. Show progress and status changes
+// while downloading
+    final result = await FileDownloader().download(task,
+        onProgress: (progress) {
+        /* print("COnverted int progress is $intprogress");
+          print('Progress: ${progress * 100}%');*/
+          int intprogress = (progress*100).toInt();
+          setdownloadProgress(intprogress);
+        },
+        onStatus: (status) => print('Status: $status'));
+// Act on the result
+    switch (result) {
+      case TaskStatus.complete:
+        print('Success!');
+
+      case TaskStatus.canceled:
+        print('Download was canceled');
+
+      case TaskStatus.paused:
+        print('Download was paused');
+
+      default:
+        final newFilepath = await FileDownloader()
+            .moveToSharedStorage(task, SharedStorage.files);
+        // await FileDownloader().moveToSharedStorage(task, SharedStorage.video);
+        final externalFilePath = await FileDownloader()
+            .moveToSharedStorage(task, SharedStorage.external);
+        final videoFilePath = await FileDownloader()
+            .moveToSharedStorage(task, SharedStorage.external);
+        if (newFilepath == null) {
+          // handle error
+          print("Error with new file path");
+        } else {
+          print("Files file path found and it is $newFilepath");
+          print("External file path found and it is $externalFilePath");
+          print("Video file path found and it is $videoFilePath");
+
+          // do something with the newFilePath
+        }
+        // final downloadedTasks= await FileDownloader().openFile(task: task);
+        print('Download not successful');
+    }
+  }
+  String generateRandomString(int length) {
+    final random = Random();
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    String result = '';
+
+    for (int i = 0; i < length; i++) {
+      result += chars[random.nextInt(chars.length)];
+    }
+
+    return result;
+  }
+  void printalltasks() async {}
 }

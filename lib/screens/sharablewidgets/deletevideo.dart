@@ -85,7 +85,7 @@ class DeleteVideo extends StatelessWidget {
                           );*/
                           homeController.
                           deletefromdb(index!);
-                          homeController.updateListView();
+                      //    homeController.updateListView();
                           Navigator.pop(context);
                         }, child: Container(
                           padding: EdgeInsets.symmetric(
