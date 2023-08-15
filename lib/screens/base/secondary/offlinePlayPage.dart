@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reelsviddownloader/controllers/adController.dart';
 import 'package:reelsviddownloader/controllers/videoplayController.dart';
 import 'package:video_player/video_player.dart';
 
@@ -15,8 +16,17 @@ class OfflinePlayPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.sizeOf(context).width;
     double screenheight = MediaQuery.sizeOf(context).height;
-    return GetBuilder<VideoPlayController>(
+    return
+      GetBuilder<AdController>(
+        initState: (v){
+    },
+    init: AdController(),
+    builder: (adcontroller){
+    return
+    GetBuilder<VideoPlayController>(
       initState: (v){
+        adcontroller.initializebannerAd();
+        adcontroller.initializeInterstitialAd();
         videoPlayController.initofflinevidplaycontroller(filepath!);
       },
         init: VideoPlayController(),
@@ -112,6 +122,8 @@ class OfflinePlayPage extends StatelessWidget {
                       height: 0,
 
                     ),
+                    adcontroller.displayBannerWidget(context),
+
                   ],
                 ),
               )
@@ -119,6 +131,6 @@ class OfflinePlayPage extends StatelessWidget {
           ),
         ),
       );
-    });
+    });});
   }
 }

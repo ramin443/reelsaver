@@ -8,8 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reelsviddownloader/constants/colorconstants.dart';
 import 'package:reelsviddownloader/constants/fontconstants.dart';
+import 'package:reelsviddownloader/controllers/adController.dart';
 import 'package:video_player/video_player.dart';
 
+final AdController adController =
+Get.put(AdController());
 class VideoPlayController extends GetxController{
   late VideoPlayerController vidcontroller;
   late double videoProgress = 0.0;
@@ -18,7 +21,14 @@ class VideoPlayController extends GetxController{
   bool reachedEnd=false;
   bool hideControls=false;
   late VideoPlayerController offlinevidcontroller;
+  int pausePlaytaps=0;
 
+  void incrementpausePlaytaps(){
+    pausePlaytaps++;
+    if(pausePlaytaps % 10 == 0){
+      adController.showInterstitialAd();
+    } update();
+  }
   void sethideoption(){
     hideControls=!hideControls;
     update();
@@ -159,7 +169,7 @@ class VideoPlayController extends GetxController{
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(onPressed: (){
-
+                  incrementpausePlaytaps();
                   if (vidcontroller.value.isPlaying) {
                     vidcontroller.pause();
                     update();
@@ -272,6 +282,7 @@ class VideoPlayController extends GetxController{
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(onPressed: (){
+                  incrementpausePlaytaps();
                   if (offlinevidcontroller.value.isPlaying) {
                     offlinevidcontroller.pause();
                     update();

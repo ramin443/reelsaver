@@ -15,11 +15,16 @@ import '../models/SavedVideos.dart';
 import '../screens/base/secondary/offlinePlayPage.dart';
 import '../screens/base/secondary/videoPlayPage.dart';
 import '../screens/sharablewidgets/deletevideo.dart';
+import 'adController.dart';
 final BaseController baseController =
 Get.put(BaseController());
+final AdController adController =
+Get.put(AdController());
 class SavedVideosController extends GetxController {
   final dbHelper = SavedVideosDatabaseHelper();
   int downloadslength=0;
+  int openVideotaps=0;
+
   SavedVideos savedvideoModel = SavedVideos(
      // id: 1,
       caption: "Wir sind hier \n WIr haben biuer dabei",
@@ -36,6 +41,12 @@ class SavedVideosController extends GetxController {
   void setdownloadslength(int count){
     downloadslength=count;
     update();
+  }
+  void incrementopenVideotaps(){
+    openVideotaps++;
+    if(openVideotaps % 3 == 0){
+      adController.showInterstitialAd();
+    }update();
   }
   Widget savedvideoslist(BuildContext context) {
     return FutureBuilder<List<SavedVideos>>(
@@ -282,6 +293,7 @@ class SavedVideosController extends GetxController {
                   children: [
                     IconButton(
                         onPressed: () {
+                          incrementopenVideotaps();
                           incrementplaysfortoday();
                           Navigator.push(
                               context,
@@ -516,6 +528,7 @@ class SavedVideosController extends GetxController {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return GestureDetector(
       onTap: () {
+        incrementopenVideotaps();
         incrementplaysfortoday();
         Navigator.push(context,
             MaterialPageRoute(builder: (context) =>  OfflinePlayPage(filepath: filepath)));

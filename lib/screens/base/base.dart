@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:reelsviddownloader/controllers/adController.dart';
 import 'package:reelsviddownloader/controllers/baseController.dart';
 import 'package:reelsviddownloader/controllers/homeController.dart';
 import 'package:reelsviddownloader/screens/base/pages/downloads.dart';
@@ -17,29 +18,42 @@ import '../../constants/teststrings.dart';
 import '../../models/parseModels.dart';
 
 class Base extends StatelessWidget {
-   Base({Key? key}) : super(key: key);
+  Base({Key? key}) : super(key: key);
   List pages = [Home(), Downloads(), Settings()];
-   final HomeController homeController =
-   Get.put(HomeController());
+  final HomeController homeController = Get.put(HomeController());
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    return GetBuilder<BaseController>(
+    return GetBuilder<AdController>(
         initState: (v) {},
-        init: BaseController(),
-        builder: (basecontroller) {
-          return Scaffold(
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: SizedBox(
-              height: 0,
-            ),
-            appBar: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              centerTitle: false,
-              actions: [
-                /*IconButton(onPressed: (){
+        init: AdController(),
+        builder: (adcontroller) {
+          return GetBuilder<BaseController>(
+              initState: (v) {
+                adcontroller.initializebannerAd();
+                adcontroller.initializeInterstitialAd();
+                adcontroller.initializeRewardedAd();
+              },
+              init: BaseController(),
+              builder: (basecontroller) {
+                return Scaffold(
+
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.miniCenterFloat,
+                  floatingActionButton: adcontroller.displayBannerWidget(context),
+                  appBar: AppBar(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    centerTitle: false,
+                    actions: [
+                      /*  IconButton(onPressed: (){
+                        adcontroller.showInterstitialAd();
+                      },
+                          icon: Icon(FeatherIcons.cloud,
+                            color: Colors.black,
+                            size: 20,)),
+                      IconButton(onPressed: (){
                   homeController.printalltasks();
                 },
                     icon: Icon(FeatherIcons.cloud,
@@ -68,78 +82,81 @@ class Base extends StatelessWidget {
                       size: 24,
                     ))
               */
-              ],
-              leading: Container(
-                  margin: EdgeInsets.only(
+                    ],
+                    leading: Container(
+                        margin: EdgeInsets.only(
 //                left: 8,top: 8
-                    left: screenWidth * 0.01946, top: screenWidth * 0.01946,
-                  ),
-                  child: SvgPicture.asset(
-                    "assets/images/Reels logo SVG.svg",
-                    //   height: 42,width: 42,
-                    height: screenWidth * 0.1021,
-                    width: screenWidth * 0.1021,
-                  )),
-              title: Container(
-                margin: EdgeInsets.only(
+                          left: screenWidth * 0.01946,
+                          top: screenWidth * 0.01946,
+                        ),
+                        child: SvgPicture.asset(
+                          "assets/images/Reels logo SVG.svg",
+                          //   height: 42,width: 42,
+                          height: screenWidth * 0.1021,
+                          width: screenWidth * 0.1021,
+                        )),
+                    title: Container(
+                      margin: EdgeInsets.only(
 //                left: 8,top: 8
-                 top: screenWidth * 0.01946,
-                ),  child: Text(
-                  "Reels Video\nDownloader",
-                  style: TextStyle(
-                      fontFamily: proximanovaregular,
-                      color: blackthemedcolor,
-                      //        fontSize: 18
-                      fontSize: screenWidth * 0.04379),
-                ),
-              ),
-            ),
-            backgroundColor: Colors.white,
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: basecontroller.currentindex,
-              selectedItemColor: royalbluethemedcolor,
-              unselectedItemColor: greythemedcolor,
-              backgroundColor: Color(0xfff5f5f5),
-              onTap: (index) {
-                basecontroller.setindex(index);
-              },
-              selectedLabelStyle: TextStyle(
-                  fontFamily: proximanovaregular,
-                  fontSize: screenWidth * 0.03041
-                  //    fontSize: 12.5
-                  ),
-              unselectedLabelStyle: TextStyle(
-                  fontFamily: proximanovaregular,
-                  fontSize: screenWidth * 0.03041
-                  //    fontSize: 12.5
-                  ),
-              items: [
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      FeatherIcons.home,
-                      //   size: 24,
-                      size: screenWidth * 0.0583,
+                        top: screenWidth * 0.01946,
+                      ),
+                      child: Text(
+                        "Reels Video\nDownloader",
+                        style: TextStyle(
+                            fontFamily: proximanovaregular,
+                            color: blackthemedcolor,
+                            //        fontSize: 18
+                            fontSize: screenWidth * 0.04379),
+                      ),
                     ),
-                    label: "Home"),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    FeatherIcons.download,
-                    //    size: 24,
-                    size: screenWidth * 0.0583,
                   ),
-                  label: "Downloads",
-                ),
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      FeatherIcons.settings,
-                      //   size: 24,
-                      size: screenWidth * 0.0583,
-                    ),
-                    label: "Settings"),
-              ],
-            ),
-          body:  pages[basecontroller.currentindex],
-          );
+                  backgroundColor: Colors.white,
+                  bottomNavigationBar: BottomNavigationBar(
+                    currentIndex: basecontroller.currentindex,
+                    selectedItemColor: royalbluethemedcolor,
+                    unselectedItemColor: greythemedcolor,
+                    backgroundColor: Color(0xfff5f5f5),
+                    onTap: (index) {
+                      basecontroller.setindex(index);
+                    },
+                    selectedLabelStyle: TextStyle(
+                        fontFamily: proximanovaregular,
+                        fontSize: screenWidth * 0.03041
+                        //    fontSize: 12.5
+                        ),
+                    unselectedLabelStyle: TextStyle(
+                        fontFamily: proximanovaregular,
+                        fontSize: screenWidth * 0.03041
+                        //    fontSize: 12.5
+                        ),
+                    items: [
+                      BottomNavigationBarItem(
+                          icon: Icon(
+                            FeatherIcons.home,
+                            //   size: 24,
+                            size: screenWidth * 0.0583,
+                          ),
+                          label: "Home"),
+                      BottomNavigationBarItem(
+                        icon: Icon(
+                          FeatherIcons.download,
+                          //    size: 24,
+                          size: screenWidth * 0.0583,
+                        ),
+                        label: "Downloads",
+                      ),
+                      BottomNavigationBarItem(
+                          icon: Icon(
+                            FeatherIcons.settings,
+                            //   size: 24,
+                            size: screenWidth * 0.0583,
+                          ),
+                          label: "Settings"),
+                    ],
+                  ),
+                  body: pages[basecontroller.currentindex],
+                );
+              });
         });
   }
 }

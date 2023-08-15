@@ -26,8 +26,9 @@ class Downloads extends StatelessWidget {
           physics: BouncingScrollPhysics(),
           child: Container(
             width: screenwidth,
+
             padding: EdgeInsets.only(
-                bottom: screenwidth * 0.05720
+                bottom: screenwidth * 0.2
             ),
            // padding: EdgeInsets.only(left: 14,right: 14),
             child: Column(

@@ -5,6 +5,8 @@ import 'package:reelsviddownloader/constants/colorconstants.dart';
 import 'package:reelsviddownloader/controllers/videoplayController.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../controllers/adController.dart';
+
 class VideoPlayPage extends StatelessWidget {
   VideoPlayPage({@required this.url});
 
@@ -16,9 +18,19 @@ class VideoPlayPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenwidth = MediaQuery.sizeOf(context).width;
     double screenheight = MediaQuery.sizeOf(context).height;
-    return GetBuilder<VideoPlayController>(
+    return
+      GetBuilder<AdController>(
+        init: AdController(),
+    initState: (v) {
+    //    v.initState();
+    },
+    builder: (adcontroller) {
+    return
+    GetBuilder<VideoPlayController>(
         init: VideoPlayController(),
         initState: (v) {
+          adcontroller.initializebannerAd();
+          adcontroller.initializeInterstitialAd();
           videoPlayController.initvidplaycontroller(url!);
       //    v.initState();
         },
@@ -115,6 +127,8 @@ class VideoPlayPage extends StatelessWidget {
                           height: 0,
 
                         ),
+                        adcontroller.displayBannerWidget(context),
+
                       ],
                     ),
                   )
@@ -143,6 +157,6 @@ class VideoPlayPage extends StatelessWidget {
               ),*/
             ),
           );
-        });
+        });});
   }
 }

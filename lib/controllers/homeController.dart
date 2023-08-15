@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:reelsviddownloader/controllers/adController.dart';
 import 'package:reelsviddownloader/models/SavedVideos.dart';
 import 'package:reelsviddownloader/screens/base/secondary/videoPlayPage.dart';
 import 'package:sqflite/sqflite.dart';
@@ -29,7 +30,8 @@ import '../screens/sharablewidgets/downloadinstruction1.dart';
 import '../screens/sharablewidgets/rateus.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+final AdController adController =
+Get.put(AdController());
 class HomeController extends GetxController {
   final dbHelper = SavedVideosDatabaseHelper();
   TextEditingController linkfieldcontroller = TextEditingController();
@@ -44,7 +46,8 @@ class HomeController extends GetxController {
   Media? receivedMedia;
   bool isLoading = false;
   String lastdownloadedurl = "";
-
+  int downloadtaps=0;
+  int openVideotaps=0;
   //the following are parsing controls
   bool isLinkValid = false;
   bool errorThrown = false;
@@ -52,6 +55,20 @@ class HomeController extends GetxController {
   late TargetPlatform? platform;
   String? localPath = '';
 
+  void incrementDownloadtaps(){
+    downloadtaps++;
+    if(downloadtaps % 3 == 0){
+      adController.showInterstitialAd();
+    }
+    update();
+
+  }
+  void incrementopenVideotaps(){
+    openVideotaps++;
+    if(openVideotaps% 3 == 0){
+      adController.showInterstitialAd();
+    }update();
+  }
   void saveVideo(SavedVideos savedVideo)async{
     await dbHelper.insertVideo(savedVideo);
     update();
@@ -389,6 +406,7 @@ class HomeController extends GetxController {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return GestureDetector(
       onTap: () {
+        incrementopenVideotaps();
         incrementplaysfortoday();
         Navigator.push(
             context,
@@ -436,6 +454,7 @@ class HomeController extends GetxController {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return GestureDetector(
       onTap: () {
+        incrementDownloadtaps();
         testdownload(receivedMedia!.url);
         setdownloadProgress(1);
         incrementdownloadsfortoday();

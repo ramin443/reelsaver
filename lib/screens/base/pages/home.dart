@@ -21,6 +21,7 @@ class Home extends StatelessWidget {
         physics: BouncingScrollPhysics(),
         child: Container(
           width: screenwidth,
+          padding: EdgeInsets.only(bottom:  screenwidth*0.148),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
