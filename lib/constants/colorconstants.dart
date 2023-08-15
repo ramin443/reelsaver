@@ -5,3 +5,4 @@ Color bluethemedcolor=Color(0xff0089FF);
 Color greythemedcolor=Color(0xff969696);
 Color blackthemedcolor=Colors.black;
 Color redthemedcolor=Color(0xffFF0000).withOpacity(0.67);
+Color lightredthemedColor=Color(0xffF18871);

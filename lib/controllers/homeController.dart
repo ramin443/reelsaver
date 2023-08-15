@@ -2,20 +2,25 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:background_downloader/background_downloader.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:reelsviddownloader/models/SavedVideos.dart';
 import 'package:reelsviddownloader/screens/base/secondary/videoPlayPage.dart';
 import 'package:sqflite/sqflite.dart';
 import '../constants/colorconstants.dart';
 import '../constants/fontconstants.dart';
 import '../constants/teststrings.dart';
 import '../dbhelpers/DownloadedVidDBHelper.dart';
+import '../dbhelpers/SavedVideosDBHelper.dart';
 import '../models/Downloaded_Video_Model.dart';
 import '../models/parseModels.dart';
 import '../screens/downloadwidgets/error_box.dart';
@@ -26,6 +31,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class HomeController extends GetxController {
+  final dbHelper = SavedVideosDatabaseHelper();
   TextEditingController linkfieldcontroller = TextEditingController();
   int showdownload = 0;
   List<DownloadedVideo> tasklist = [];
@@ -37,6 +43,7 @@ class HomeController extends GetxController {
   ApiResponse? receivedResponse;
   Media? receivedMedia;
   bool isLoading = false;
+  String lastdownloadedurl = "";
 
   //the following are parsing controls
   bool isLinkValid = false;
@@ -44,6 +51,20 @@ class HomeController extends GetxController {
   int downloadProgress = 0;
   late TargetPlatform? platform;
   String? localPath = '';
+
+  void saveVideo(SavedVideos savedVideo)async{
+    await dbHelper.insertVideo(savedVideo);
+    update();
+  }
+  void deleteVideo(String url)async{
+    await dbHelper.deleteVideo(url);
+    update();
+  }
+  
+  void setlastdownload(String url) {
+    lastdownloadedurl = url;
+    update();
+  }
 
   //the following includes the functional code for parsing control
   void setdownloadProgress(int progress) {
@@ -199,14 +220,39 @@ class HomeController extends GetxController {
                 borderRadius: BorderRadius.all(Radius.circular(11)),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(11)),
-                child: Image.network(
+                  borderRadius: BorderRadius.all(Radius.circular(11)),
+                  child: CachedNetworkImage(
+                    imageUrl: receivedMedia!.thumbnail,
+                    fit: BoxFit.cover,
+                    width: screenwidth * 0.837,
+                    height: screenwidth * 0.841,
+                    progressIndicatorBuilder:
+                        (context, url, downloadProgress) => Container(
+                      width: screenwidth * 0.441,
+                      height: screenwidth * 0.639,
+                      decoration: BoxDecoration(color: Colors.white),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  royalbluethemedcolor),
+                              backgroundColor: Colors.black12,
+                              value: downloadProgress.progress),
+                        ],
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  )
+                  /*Image.network(
                   receivedMedia!.thumbnail,
                   fit: BoxFit.cover,
                   width: screenwidth * 0.837,
                   height: screenwidth * 0.841,
-                ),
-              ),
+                ),*/
+                  ),
             ),
             Container(
               width: screenwidth * 0.837,
@@ -222,7 +268,6 @@ class HomeController extends GetxController {
             ),
             Container(
               width: screenwidth * 0.837,
-
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -233,6 +278,7 @@ class HomeController extends GetxController {
                   Expanded(
                     child: IconButton(
                       onPressed: () {
+                        incrementplaysfortoday();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -266,14 +312,14 @@ class HomeController extends GetxController {
                           fontSize: screenwidth * 0.03),
                     ),
                   ),
-                  downloadProgress>0 &&  downloadProgress<100?
-                  downloadProgressBar(context):
-                  downloadProgress==0?
-                  downloadbutton(context):
-                  downloadProgress==100?
-                  openVideoButton(context):
-                  downloadbutton(context)
-                 ,
+                //  receivedMedia!.url != lastdownloadedurl ? downloadbutton(context) :
+                  downloadProgress > 0 && downloadProgress < 100
+                          ? downloadProgressBar(context)
+                          : downloadProgress == 0
+                              ? downloadbutton(context)
+                              : downloadProgress == 100
+                                  ? openVideoButton(context)
+                                  : downloadbutton(context),
                 ],
               ),
             ),
@@ -284,7 +330,7 @@ class HomeController extends GetxController {
   Widget downloadProgressBar(BuildContext context) {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return Container(
-      height: 6,
+     // height: 6,
       width: screenwidth * 0.715,
       margin: EdgeInsets.only(bottom: screenwidth * 0.0634),
       child: Column(
@@ -295,7 +341,7 @@ class HomeController extends GetxController {
             children: [
               Container(
                 margin: EdgeInsets.only(
-                  //        left: 12
+                    //        left: 12
                     left: screenwidth * 0.0291),
                 child: Text(
                   "Downloading....",
@@ -321,7 +367,7 @@ class HomeController extends GetxController {
             ],
           ),
           SizedBox(
-            height: 12,
+            height: 5,
           ),
           ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -342,12 +388,12 @@ class HomeController extends GetxController {
   Widget openVideoButton(BuildContext context) {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return GestureDetector(
-      onTap: (){
+      onTap: () {
+        incrementplaysfortoday();
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    VideoPlayPage(url: receivedMedia!.url)));
+                builder: (context) => VideoPlayPage(url: receivedMedia!.url)));
       },
       child: Container(
         margin: EdgeInsets.only(bottom: screenwidth * 0.0634),
@@ -368,7 +414,7 @@ class HomeController extends GetxController {
             ),
             Container(
               margin: EdgeInsets.only(
-                //        left: 12
+                  //        left: 12
                   left: screenwidth * 0.0291),
               child: Text(
                 "Open Video",
@@ -385,11 +431,14 @@ class HomeController extends GetxController {
       ),
     );
   }
+
   Widget downloadbutton(BuildContext context) {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         testdownload(receivedMedia!.url);
+        setdownloadProgress(1);
+        incrementdownloadsfortoday();
       },
       child: Container(
         margin: EdgeInsets.only(bottom: screenwidth * 0.0634),
@@ -429,6 +478,7 @@ class HomeController extends GetxController {
   }
 
   void parsePastedLink({String? urli}) async {
+    setdownloadProgress(0);
     final url =
         'https://instagram-saver-download-anything-on-instagram.p.rapidapi.com/igsanitized';
     final headers = {
@@ -767,7 +817,8 @@ class HomeController extends GetxController {
 
   void downloadtestvideo(String url) async {
     String videoUrl = url;
-        String forcedurl="https://z-p4-instagram.fsgn5-12.fna.fbcdn.net/v/t66.30100-16/318229749_938006627283968_4480891006851727740_n.mp4?_nc_ht=z-p4-instagram.fsgn5-12.fna.fbcdn.net&_nc_cat=108&_nc_ohc=MngP_LvlbmwAX85qlPG&edm=APfKNqwBAAAA&ccb=7-5&oh=00_AfDuGAHuKPPribFmiOU-tyjutyHtOsZ1XDA-Aip3Vk7lNQ&oe=64D8FEDE&_nc_sid=721f0c";
+    String forcedurl =
+        "https://z-p4-instagram.fsgn5-12.fna.fbcdn.net/v/t66.30100-16/318229749_938006627283968_4480891006851727740_n.mp4?_nc_ht=z-p4-instagram.fsgn5-12.fna.fbcdn.net&_nc_cat=108&_nc_ohc=MngP_LvlbmwAX85qlPG&edm=APfKNqwBAAAA&ccb=7-5&oh=00_AfDuGAHuKPPribFmiOU-tyjutyHtOsZ1XDA-Aip3Vk7lNQ&oe=64D8FEDE&_nc_sid=721f0c";
     String caption =
         "Save THIS\u2705\ud83d\udccc\n\nThese are my all time favorite cookies. \n\nNot only do they taste amazing, one cookie packs a punch filling you up nicely.\n\nI must warn you it tastes bland first time around given that there\u2019s no sugar added (except honey). \n\nYou\u2019re more than welcome to play with honey serving, as well as other natural sweeteners like Stevia. \n\nFull instructions & recipe below:\n\n-You will need: \n\n8 eggs\n1 cup of oats\n7 heaping tablespoons of peanut butter\nTeaspoon of honey\nTeaspoon of vanilla extract\n5 scoops of protein of your choice (I use Isopure vanilla flavored)\n1 banana\n2 scoops of Casein Protein of your choice (I use Optimum Nutrition)\n\n-Preheat oven to 425 degrees Fahrenheit. \n\nWhen placing cookies on baking tray:\nOne tablespoon = 1 cookie.\n\nPlace cookies into the baking tray. Make sure to spray the baking sheet with non-stick cooking oil spray!\n\nSet timer for 9 minutes. \n\nAnd voila! \n\nTotal cookies: 22\n\nOverall Macros:\nFat: 159g\nCarbs: 98g\nProtein: 257g\n\nMacros per cookie: \nProtein: 12g\nFat: 7g\nCarbs: 4g\n\n*I recommend storing them in a fridge.\n\nFollow @rishandfit for more fitness content\ud83e\uddbe\n\n\u2022\n\u2022\n\u2022\n\n#fyp #fyp\u30b7 #foru #explore #fitness #gym #gymaddict #healthylifestyle #proteinrecipes #healthyliving #bodypositivity #fit #fitfam #fitnessaddict #fitnessjourney #fitnessmotivation #reels #explorepage";
     String finalpurestring = caption.replaceAll(RegExp(r'[\x00-\x1F]'), '');
@@ -781,13 +832,13 @@ class HomeController extends GetxController {
 
     final Directory? externalDir = await getExternalStorageDirectory();
     String externalStoragePath = externalDir!.path + '/' + finalpurestring;
-    String randomUniqueString=generateRandomString(4);
-    String filename=randomUniqueString;
-    String reccaption =receivedResponse!.caption;
-    if(reccaption.length>25){
-      filename="${reccaption.substring(0,24)}$randomUniqueString.mp4";
-    }else{
-      filename="$reccaption$randomUniqueString.mp4";
+    String randomUniqueString = generateRandomString(4);
+    String filename = randomUniqueString;
+    String reccaption = receivedResponse!.caption;
+    if (reccaption.length > 25) {
+      filename = "${reccaption.substring(0, 24)}$randomUniqueString.mp4";
+    } else {
+      filename = "$reccaption$randomUniqueString.mp4";
     }
 
     final task = DownloadTask(
@@ -809,9 +860,9 @@ class HomeController extends GetxController {
 // while downloading
     final result = await FileDownloader().download(task,
         onProgress: (progress) {
-        /* print("COnverted int progress is $intprogress");
+          /* print("COnverted int progress is $intprogress");
           print('Progress: ${progress * 100}%');*/
-          int intprogress = (progress*100).toInt();
+          int intprogress = (progress * 100).toInt();
           setdownloadProgress(intprogress);
         },
         onStatus: (status) => print('Status: $status'));
@@ -827,6 +878,9 @@ class HomeController extends GetxController {
         print('Download was paused');
 
       default:
+        print("URL received here is: $videoUrl");
+        print("URL set on top is: ${receivedMedia!.url}");
+        setlastdownload(videoUrl);
         final newFilepath = await FileDownloader()
             .moveToSharedStorage(task, SharedStorage.files);
         // await FileDownloader().moveToSharedStorage(task, SharedStorage.video);
@@ -838,6 +892,12 @@ class HomeController extends GetxController {
           // handle error
           print("Error with new file path");
         } else {
+          SavedVideos savedVidmodel= SavedVideos(caption: receivedResponse!.caption,
+              postType: receivedResponse!.postType, height: receivedMedia!.dimension.height,
+              width: receivedMedia!.dimension.width, mediaType: receivedMedia!.mediaType,
+              thumbnail: receivedMedia!.thumbnail, url: url, fileLocationPath: newFilepath);
+          saveVideo(savedVidmodel);
+          moveFileToGallery(newFilepath);
           print("Files file path found and it is $newFilepath");
           print("External file path found and it is $externalFilePath");
           print("Video file path found and it is $videoFilePath");
@@ -848,9 +908,46 @@ class HomeController extends GetxController {
         print('Download not successful');
     }
   }
+  void incrementdownloadsfortoday() async {
+    // Get reference to Firestore collection
+    var collectionRef = FirebaseFirestore.instance.collection('NeuDownloads');
+    var doc = await collectionRef
+        .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
+        .get();
+    if (doc.exists) {
+      await FirebaseFirestore.instance
+          .collection("NeuDownloads")
+          .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
+          .update({"numberofdownloads": FieldValue.increment(1)});
+    } else {
+      await FirebaseFirestore.instance
+          .collection("NeuDownloads")
+          .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
+          .set({"numberofdownloads": 1});
+    }
+  }
+  void incrementplaysfortoday() async {
+    // Get reference to Firestore collection
+    var collectionRef = FirebaseFirestore.instance.collection('Plays');
+    var doc = await collectionRef
+        .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
+        .get();
+    if (doc.exists) {
+      await FirebaseFirestore.instance
+          .collection("Plays")
+          .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
+          .update({"numberofplays": FieldValue.increment(1)});
+    } else {
+      await FirebaseFirestore.instance
+          .collection("Plays")
+          .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
+          .set({"numberofplays": 1});
+    }
+  }
   String generateRandomString(int length) {
     final random = Random();
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const chars =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     String result = '';
 
     for (int i = 0; i < length; i++) {
@@ -858,6 +955,13 @@ class HomeController extends GetxController {
     }
 
     return result;
+  }
+  Future<void> moveFileToGallery(String filepath) async {
+    final file = File(filepath); // Replace with your file path
+    final galleryDirectory = await getExternalStorageDirectory();
+    final newFilePath = '${galleryDirectory!.path}/DCIM/${file.path.split('/').last}';
+
+    await file.copy(newFilePath);
   }
   void printalltasks() async {}
 }

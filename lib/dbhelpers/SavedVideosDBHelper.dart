@@ -63,13 +63,27 @@ class SavedVideosDatabaseHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
-
+  Future<void> deleteVideo(String newurl) async {
+    final db = await database;
+    print("Reached here");
+    await db.delete(
+      table,
+      where: '$columnUrl = ?',
+      whereArgs: [newurl],
+    );
+  }
+  Future<int> getRecordCount() async {
+    final db = await database;
+    return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'))!;
+  }
   Future<List<SavedVideos>> getAllVideos() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(table);
+    final List<Map<String, dynamic>> maps = await db.query(table,
+      orderBy: '$columnId DESC', // Sort by id in descending order
+    );
     return List.generate(maps.length, (i) {
       return SavedVideos(
-        id: maps[i][columnId],
+     //   id: maps[i][columnId],
         caption: maps[i][columnCaption],
         postType: maps[i][columnPostType],
         height: maps[i][columnHeight],

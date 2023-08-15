@@ -1,16 +1,15 @@
 class SavedVideos {
-  final int id;
-  final String caption;
-  final String postType;
-  final int height;
-  final int width;
-  final String mediaType;
-  final String thumbnail;
-  final String url;
-  final String fileLocationPath;
+   int? id;
+   String? caption;
+   String? postType;
+   int? height;
+   int? width;
+   String? mediaType;
+   String? thumbnail;
+   String? url;
+   String? fileLocationPath;
 
   SavedVideos({
-    required this.id,
     required this.caption,
     required this.postType,
     required this.height,
@@ -20,6 +19,7 @@ class SavedVideos {
     required this.url,
     required this.fileLocationPath,
   });
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -33,4 +33,16 @@ class SavedVideos {
       'fileLocationPath': fileLocationPath,
     };
   }
+   SavedVideos.fromMap(Map<String, dynamic> map) {
+     id = map['id'];
+     caption = map['caption'];
+     postType = map['postType'];
+     height = map['height'];
+     width = map['width'];
+     mediaType = map['mediaType'];
+     thumbnail = map['thumbnail'];
+     url = map['url'];
+     fileLocationPath = map['fileLocationPath'];
+   }
+
 }

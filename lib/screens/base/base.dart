@@ -39,7 +39,7 @@ class Base extends StatelessWidget {
               backgroundColor: Colors.transparent,
               centerTitle: false,
               actions: [
-                IconButton(onPressed: (){
+                /*IconButton(onPressed: (){
                   homeController.printalltasks();
                 },
                     icon: Icon(FeatherIcons.cloud,
@@ -67,6 +67,7 @@ class Base extends StatelessWidget {
                       color: Colors.black,
                       size: 24,
                     ))
+              */
               ],
               leading: Container(
                   margin: EdgeInsets.only(

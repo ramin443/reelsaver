@@ -20,124 +20,128 @@ class VideoPlayPage extends StatelessWidget {
         init: VideoPlayController(),
         initState: (v) {
           videoPlayController.initvidplaycontroller(url!);
+      //    v.initState();
         },
         dispose: (v) {
-          // videoPlayController.dispose();
-        },
+       //    videoPlayController.pausefunction();
+      //  v.dispose();
+           },
         builder: (videoplaycontroller) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Stack(
-              children: [
-                SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
-                  child: Container(
+          return WillPopScope(
+            onWillPop: videoplaycontroller.onBackPressed,
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              body: Stack(
+                children: [
+                  SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    child: Container(
+                      width: screenwidth,
+                      height: screenheight,
+                      child:
+
+                      videoPlayController.vidcontroller.value.isInitialized
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: videoPlayController
+                                      .vidcontroller.value.aspectRatio,
+                                  child: VideoPlayer(
+                                      videoPlayController.vidcontroller),
+                                )
+                              ],
+                            )
+                          : Column(
+                        mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+
+                                CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: royalbluethemedcolor,
+                                ),
+                              ],
+                            ),
+
+                      // Show loading indicator
+                    ),
+                  ),
+                  Container(
+                    width: screenwidth,
+                    height: screenheight * 0.25,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        videoplaycontroller.hideControls?
+                        SizedBox(height: 0,):
+                        AppBar(
+                          backgroundColor: Colors.black12,
+                          elevation: 0,
+                          //  centerTitle: true,
+                          leading: IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              CupertinoIcons.back,
+                              color: Colors.white,
+                              size: screenwidth * 0.06,
+                            ),
+                          ),
+                          //    title: Text('Video Player'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
                     width: screenwidth,
                     height: screenheight,
-                    child:
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                            margin: EdgeInsets.only(
+                                bottom: screenwidth*0.04,right: screenwidth*0.04
+                            ),
+                            child: videoplaycontroller.hideControlsButton(context)),
+                        videoplaycontroller.hideControls?
+                        SizedBox(
+                          height: screenwidth*0.255,
+                        ):videoplaycontroller.videocontrolaction(context),
+                        SizedBox(
+                          width: screenwidth,
+                          height: 0,
 
-                    videoPlayController.vidcontroller.value.isInitialized
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              AspectRatio(
-                                aspectRatio: videoPlayController
-                                    .vidcontroller.value.aspectRatio,
-                                child: VideoPlayer(
-                                    videoPlayController.vidcontroller),
-                              )
-                            ],
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: screenwidth*0.65,
-                              ),
-                              CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: royalbluethemedcolor,
-                              ),
-                            ],
-                          ),
-
-                    // Show loading indicator
-                  ),
-                ),
-                Container(
-                  width: screenwidth,
-                  height: screenheight * 0.25,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      videoplaycontroller.hideControls?
-                      SizedBox(height: 0,):
-                      AppBar(
-                        backgroundColor: Colors.black12,
-                        elevation: 0,
-                        //  centerTitle: true,
-                        leading: IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            CupertinoIcons.back,
-                            color: Colors.white,
-                            size: screenwidth * 0.06,
-                          ),
                         ),
-                        //    title: Text('Video Player'),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  width: screenwidth,
-                  height: screenheight,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                          margin: EdgeInsets.only(
-                              bottom: screenwidth*0.04,right: screenwidth*0.04
-                          ),
-                          child: videoplaycontroller.hideControlsButton(context)),
-                      videoplaycontroller.hideControls?
-                      SizedBox(
-                        height: screenwidth*0.255,
-                      ):videoplaycontroller.videocontrolaction(context),
-                      SizedBox(
-                        width: screenwidth,
-                        height: 0,
-
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-         /*   floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat ,
-            bottomNavigationBar: SizedBox(
-              width: screenwidth,
-              height: screenheight*0.18,
-
-            ),
-            floatingActionButton:
-                videoplaycontroller.videocontrolaction(context),*/
-            /*FloatingActionButton(
-              onPressed: () {
-                if (videoPlayController.vidcontroller.value.isPlaying) {
-                  videoPlayController.vidcontroller.pause();
-                } else {
-                  videoPlayController.vidcontroller.play();
-                }
-              },
-              child: Icon(
-                videoPlayController.vidcontroller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                      ],
+                    ),
+                  )
+                ],
               ),
-            ),*/
+         /*   floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat ,
+              bottomNavigationBar: SizedBox(
+                width: screenwidth,
+                height: screenheight*0.18,
+
+              ),
+              floatingActionButton:
+                  videoplaycontroller.videocontrolaction(context),*/
+              /*FloatingActionButton(
+                onPressed: () {
+                  if (videoPlayController.vidcontroller.value.isPlaying) {
+                    videoPlayController.vidcontroller.pause();
+                  } else {
+                    videoPlayController.vidcontroller.play();
+                  }
+                },
+                child: Icon(
+                  videoPlayController.vidcontroller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                ),
+              ),*/
+            ),
           );
         });
   }

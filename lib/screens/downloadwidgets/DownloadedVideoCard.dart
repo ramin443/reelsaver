@@ -84,9 +84,7 @@ class DownloadedVideoCard extends StatelessWidget {
                                                 Radius.circular(16)),
                                           ),
                                           children: [DeleteVideo(
-                                            index: index,
-                                            taskid: downloadedvideo!.taskid.toString(),
-
+                                            newUrl: "",
                                           )]));
                                 },
                                 child: Container(

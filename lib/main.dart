@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:reelsviddownloader/initial/splashscreen.dart';
 import 'package:reelsviddownloader/screens/base/base.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 

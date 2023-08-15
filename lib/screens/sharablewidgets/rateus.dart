@@ -16,6 +16,7 @@ class RateUs extends StatelessWidget {
             return
               GestureDetector(
                 onTap: (){
+                  ratecontroller.openStoreListingReview();
              //     ratecontroller.onreviewboxtapped();
 //                  ratecontroller.requestreview();
                 },
