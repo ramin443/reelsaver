@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -7,6 +8,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:feather_icons/feather_icons.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,7 +59,8 @@ class HomeController extends GetxController {
 
   void incrementDownloadtaps(){
     downloadtaps++;
-    if(downloadtaps % 3 == 0){
+    int downtaplimit=adController.downtapfrequency;
+    if(downloadtaps % downtaplimit == 0){
       adController.showInterstitialAd();
     }
     update();
@@ -65,7 +68,9 @@ class HomeController extends GetxController {
   }
   void incrementopenVideotaps(){
     openVideotaps++;
-    if(openVideotaps% 3 == 0){
+    int playtaplimit=adController.playtapfrequency;
+
+    if(openVideotaps % playtaplimit == 0){
       adController.showInterstitialAd();
     }update();
   }
@@ -882,7 +887,9 @@ class HomeController extends GetxController {
           /* print("COnverted int progress is $intprogress");
           print('Progress: ${progress * 100}%');*/
           int intprogress = (progress * 100).toInt();
-          setdownloadProgress(intprogress);
+          if(intprogress>0){
+            setdownloadProgress(intprogress);
+          }
         },
         onStatus: (status) => print('Status: $status'));
 // Act on the result
@@ -930,9 +937,10 @@ class HomeController extends GetxController {
   void incrementdownloadsfortoday() async {
     // Get reference to Firestore collection
     var collectionRef = FirebaseFirestore.instance.collection('NeuDownloads');
-    var doc = await collectionRef
+    /*var doc = await collectionRef
         .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
         .get();
+
     if (doc.exists) {
       await FirebaseFirestore.instance
           .collection("NeuDownloads")
@@ -943,12 +951,16 @@ class HomeController extends GetxController {
           .collection("NeuDownloads")
           .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
           .set({"numberofdownloads": 1});
-    }
+    }*/
+    await collectionRef.doc(DateFormat.yMMMMd('en_US').format(DateTime.now())).
+    set({
+      "numberofdownloads": FieldValue.increment(1)
+    },SetOptions(merge: true));
   }
   void incrementplaysfortoday() async {
     // Get reference to Firestore collection
     var collectionRef = FirebaseFirestore.instance.collection('Plays');
-    var doc = await collectionRef
+    /*var doc = await collectionRef
         .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
         .get();
     if (doc.exists) {
@@ -961,7 +973,11 @@ class HomeController extends GetxController {
           .collection("Plays")
           .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
           .set({"numberofplays": 1});
-    }
+    }*/
+    await collectionRef.doc(DateFormat.yMMMMd('en_US').format(DateTime.now())).
+    set({
+      "numberofplays": FieldValue.increment(1)
+    },SetOptions(merge: true));
   }
   String generateRandomString(int length) {
     final random = Random();

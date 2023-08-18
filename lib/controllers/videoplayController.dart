@@ -25,7 +25,8 @@ class VideoPlayController extends GetxController{
 
   void incrementpausePlaytaps(){
     pausePlaytaps++;
-    if(pausePlaytaps % 10 == 0){
+    int playtaplimit=adController.playtapfrequency;
+    if(pausePlaytaps % playtaplimit == 0){
       adController.showInterstitialAd();
     } update();
   }

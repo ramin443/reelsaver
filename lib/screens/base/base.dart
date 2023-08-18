@@ -31,6 +31,7 @@ class Base extends StatelessWidget {
         builder: (adcontroller) {
           return GetBuilder<BaseController>(
               initState: (v) {
+                adcontroller.initializestreams();
                 adcontroller.initializebannerAd();
                 adcontroller.initializeInterstitialAd();
                 adcontroller.initializeRewardedAd();
@@ -48,12 +49,12 @@ class Base extends StatelessWidget {
                     centerTitle: false,
                     actions: [
                       /*  IconButton(onPressed: (){
-                        adcontroller.showInterstitialAd();
+                        adcontroller.fetchbanneradsVal();
                       },
                           icon: Icon(FeatherIcons.cloud,
                             color: Colors.black,
-                            size: 20,)),
-                      IconButton(onPressed: (){
+                            size: 20,)),*/
+                      /*  IconButton(onPressed: (){
                   homeController.printalltasks();
                 },
                     icon: Icon(FeatherIcons.cloud,

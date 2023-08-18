@@ -44,7 +44,8 @@ class SavedVideosController extends GetxController {
   }
   void incrementopenVideotaps(){
     openVideotaps++;
-    if(openVideotaps % 3 == 0){
+    int downtaplimit=adController.downtapfrequency;
+    if(openVideotaps % downtaplimit == 0){
       adController.showInterstitialAd();
     }update();
   }
@@ -90,7 +91,7 @@ class SavedVideosController extends GetxController {
   void incrementdownloadsfortoday() async {
     // Get reference to Firestore collection
     var collectionRef = FirebaseFirestore.instance.collection('NeuDownloads');
-    var doc = await collectionRef
+   /* var doc = await collectionRef
         .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
         .get();
     if (doc.exists) {
@@ -103,7 +104,11 @@ class SavedVideosController extends GetxController {
           .collection("Downloads")
           .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
           .set({"numberofdownloads": 1});
-    }
+    }*/
+    await collectionRef.doc(DateFormat.yMMMMd('en_US').format(DateTime.now())).
+    set({
+      "numberofdownloads": FieldValue.increment(1)
+    },SetOptions(merge: true));
   }
   void setreceivedlength()async{
     int recordCount = await dbHelper.getRecordCount();
@@ -504,7 +509,7 @@ class SavedVideosController extends GetxController {
   void incrementplaysfortoday() async {
     // Get reference to Firestore collection
     var collectionRef = FirebaseFirestore.instance.collection('Plays');
-    var doc = await collectionRef
+    /*var doc = await collectionRef
         .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
         .get();
     if (doc.exists) {
@@ -517,7 +522,11 @@ class SavedVideosController extends GetxController {
           .collection("Plays")
           .doc(DateFormat.yMMMMd('en_US').format(DateTime.now()))
           .set({"numberofplays": 1});
-    }
+    }*/
+    await collectionRef.doc(DateFormat.yMMMMd('en_US').format(DateTime.now())).
+    set({
+      "numberofplays": FieldValue.increment(1)
+    },SetOptions(merge: true));
   }
   void deleteVideo(String url )async{
     await dbHelper.deleteVideo(url);
