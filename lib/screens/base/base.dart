@@ -48,8 +48,8 @@ class Base extends StatelessWidget {
                     backgroundColor: Colors.transparent,
                     centerTitle: false,
                     actions: [
-                      /*  IconButton(onPressed: (){
-                        adcontroller.fetchbanneradsVal();
+                   /*    IconButton(onPressed: (){
+                        homeController.extractShortcode("https://www.instagram.com/p/CvgakunSxqd/?igshid=MzRlODBiNWFlZA==");
                       },
                           icon: Icon(FeatherIcons.cloud,
                             color: Colors.black,

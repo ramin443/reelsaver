@@ -31,7 +31,7 @@ class DownloadInstructionOne extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                getastep(context,1,"Copy Link from a Instagram reels video","Open Instagram app in your device and open the reels video you want"
+                getastep(context,1,"Copy Link from a Instagram reels video","Open Instagram app in your device and open the reels video you want "
                 "to download. Tap on the share button and then"
                 "press the copy link button."),
                 getastep(context,2,"The link will be detected automatically. If it does not "

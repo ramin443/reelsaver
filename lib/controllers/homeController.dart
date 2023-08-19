@@ -519,8 +519,9 @@ class HomeController extends GetxController {
       print(response.body);
       parseResponsetoOutput(response.body);
     } catch (error) {
-      seterrorthrowntrue();
-      print('Error occurred: $error');
+      runBackupdownload(urli!);
+//      seterrorthrowntrue();
+      print('Error occurred with first option: $error');
     }
   }
 
@@ -998,5 +999,89 @@ class HomeController extends GetxController {
 
     await file.copy(newFilePath);
   }
-  void printalltasks() async {}
+  //here is the code for backup fetching function
+  void runBackupdownload(String url){
+    String shortCode=extractShortcode(url);
+    extractfromBulkScraper(shortCode);
+  }
+  String extractShortcode(String url) {
+    // Splitting the URL by '/' and getting the last part
+    List<String> parts = url.split('/');
+    String secondlastPart = parts[parts.length-2];
+
+    // Removing any query parameters or fragments
+    if (parts.last.contains('?')) {
+      List<String> queryParams = parts.last.split('?');
+      print("Query partams is ${ queryParams[0]}");
+      return secondlastPart;
+    }
+    return parts.last;
+  //  print("Short code is $lastPart");
+  }
+
+  void extractfromBulkScraper(String shortcode) async{
+    final String url =
+        'https://instagram-bulk-scraper-latest.p.rapidapi.com/webmedia_info_from_shortcode/$shortcode';
+
+    final Map<String, String> headers = {
+      'X-RapidAPI-Key': '1b6b87d966msh79911a19efb2892p1e4e0fjsn0e980c80dc71',
+      'X-RapidAPI-Host': 'instagram-bulk-scraper-latest.p.rapidapi.com',
+    };
+    try {
+      final response = await http.get(Uri.parse(url), headers: headers);
+      if (response.statusCode == 200) {
+        //print(response.body);
+        parseBackUpResponsetoOutput(response.body);
+      } else {
+        seterrorthrowntrue();
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+  void parseBackUpResponsetoOutput(String responsebody) {
+    // String finalpurestring = sampleResponsefromreels.replaceAll(RegExp(r'[^\x00-\x7F]+'), '');
+    String finalpurestring =
+    responsebody.replaceAll(RegExp(r'[\x00-\x1F]'), '');
+    Map<String, dynamic> parsedJson = json.decode(finalpurestring);
+    bool isvideo = parsedJson['data']['is_video'];
+    String mediaType="Video";
+    if(isvideo){
+      mediaType="Video";
+      print("Post type is video");
+      String caption=parsedJson['data']['edge_media_to_caption']['edges'][0]['node']['text'];
+      String videoUrl=parsedJson['data']['video_url'];
+      String thumbnail=parsedJson['data']['thumbnail_src'];
+      int height=parsedJson['data']['dimensions']['height'];
+      int width=parsedJson['data']['dimensions']['width'];
+      Dimension dimensions=Dimension(height: height, width: width);
+      List<Media> medias = [Media(dimension: dimensions, mediaType: mediaType, thumbnail: thumbnail, url: videoUrl)];
+      ApiResponse apiResponse =ApiResponse(caption: caption, media: medias, postType: mediaType);
+      receivedMedia=medias[0];
+      receivedResponse=apiResponse;
+      setloadingfalse();
+      update();
+    }else{
+      mediaType="Photo";
+      seterrorthrowntrue();
+      print("Post type is not video");
+    }
+  
+/*
+    ApiResponse response = ApiResponse.fromJson(parsedJson);
+    print("Post Type: ${response.postType}");
+    receivedResponse = response;
+    for (var media in response.media) {
+      receivedMedia = media;
+      setloadingfalse();
+      print("Media Type: ${media.mediaType}");
+      print("Thumbnail: ${media.thumbnail}");
+      print("URL: ${media.url}");
+      print(
+          "Dimension - Height: ${media.dimension.height}, Width: ${media.dimension.width}");
+    }*/
+    update();
+  }
+
 }
