@@ -31,14 +31,11 @@ class DownloadInstructionOne extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                getastep(context,1,"Copy Link from a Instagram reels video","Open Instagram app in your device and open the reels video you want "
-                "to download. Tap on the share button and then"
+                getastep(context,1,"Copy Link from a Instagram reels video","Tap on the share button and then "
                 "press the copy link button."),
-                getastep(context,2,"The link will be detected automatically. If it does not "
-                    "show, Paste the link using the Paste link button",""),
-                getastep(context,3,"Look for quality options for video download and press "
-                    "the button for respective quality.","The download should start automatically in the background and "
-                 " will also show progress in the notification bar"),
+                getastep(context,2,"Paste Link",""),
+                getastep(context,3,"Press the download button after the post is loaded","Tap the play button to view the full video from the downloads"
+                  "tab or the home screen."),
          ],
             ),
           ),
@@ -74,7 +71,7 @@ Expanded(
                 fontFamily: proximanovaregular,
                 color: Colors.black87,
                 //      fontSize: 14
-                fontSize: screenwidth*0.03527
+                fontSize: screenwidth*0.04027
             )
         ))])),
       subpoint!=""?
@@ -88,7 +85,7 @@ Expanded(
 color: Colors.black.withOpacity(0.49),
           fontFamily: proximanovaregular,
   //        fontSize: 13.5
-    fontSize: screenwidth*0.03284
+    fontSize: screenwidth*0.03684
         ),),
       ):SizedBox(height: 0,)
       ]),

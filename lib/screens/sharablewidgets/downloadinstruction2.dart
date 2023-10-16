@@ -23,7 +23,7 @@ class DownloadInstructionTwo extends StatelessWidget {
                   fontFamily: proximanovabold,
                   color: blackthemedcolor,
                   //     fontSize: 17.5
-                  fontSize: screenwidth * 0.04257),
+                  fontSize: screenwidth * 0.04657),
             ),
           ),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -45,7 +45,7 @@ class DownloadInstructionTwo extends StatelessWidget {
                     fontFamily: proximanovaregular,
                     color: greythemedcolor,
                     //     fontSize: 17.5
-                    fontSize: screenwidth * 0.03527),
+                    fontSize: screenwidth * 0.04127),
               ),
             )
           ]),
@@ -66,8 +66,7 @@ class DownloadInstructionTwo extends StatelessWidget {
                 getastep(
                     context,
                     5,
-                    "The link will be detected automatically. If it does\n"
-                    "not show, Paste the link using the Paste link\nbutton"),
+                    "Tap the paste link putton and the download\nbutton after video is retrieved."),
               ],
             ),
           ),
@@ -97,7 +96,7 @@ class DownloadInstructionTwo extends StatelessWidget {
                           fontFamily: proximanovaregular,
                           color: Colors.black87,
                           //      fontSize: 14
-                          fontSize: screenwidth * 0.03527)),
+                          fontSize: screenwidth * 0.04027)),
                 ])),
           ]),
     );

@@ -454,15 +454,23 @@ class HomeController extends GetxController {
       ),
     );
   }
+  void checkpermissionsandDownload()async{
+    var manageExternalStoragestatus = await Permission.manageExternalStorage.status;
 
+    if(manageExternalStoragestatus.isDenied){
+      await Permission.manageExternalStorage.request();
+    }
+    incrementDownloadtaps();
+    testdownload(receivedMedia!.url);
+    setdownloadProgress(1);
+    incrementdownloadsfortoday();
+
+  }
   Widget downloadbutton(BuildContext context) {
     double screenwidth = MediaQuery.sizeOf(context).width;
     return GestureDetector(
       onTap: () {
-        incrementDownloadtaps();
-        testdownload(receivedMedia!.url);
-        setdownloadProgress(1);
-        incrementdownloadsfortoday();
+        checkpermissionsandDownload();
       },
       child: Container(
         margin: EdgeInsets.only(bottom: screenwidth * 0.0634),
@@ -500,6 +508,26 @@ class HomeController extends GetxController {
       ),
     );
   }
+  void neuParsePastedLink({String? urli})async{
+    String shortCode=extractShortcode(urli!);
+    final encodedParams = Uri(queryParameters: {'shortcode': shortCode}).query;
+
+    final Uri url = Uri.parse('https://instagram-saver-download-anything-on-instagram.p.rapidapi.com/post_data');
+
+    final Map<String, String> headers = {
+      'content-type': 'application/x-www-form-urlencoded',
+      'X-RapidAPI-Key': '1b6b87d966msh79911a19efb2892p1e4e0fjsn0e980c80dc71',
+      'X-RapidAPI-Host': 'instagram-saver-download-anything-on-instagram.p.rapidapi.com',
+    };
+
+    final response = await http.post(url, headers: headers, body: encodedParams);
+
+    if (response.statusCode == 200) {
+      print(response.body);
+    } else {
+      print('Request failed with status: ${response.statusCode}');
+    }
+  }
 
   void parsePastedLink({String? urli}) async {
     setdownloadProgress(0);
@@ -519,9 +547,36 @@ class HomeController extends GetxController {
       print(response.body);
       parseResponsetoOutput(response.body);
     } catch (error) {
+      print('Error from pasted link');
+      runnewMainDownload(urli!);
       runBackupdownload(urli!);
 //      seterrorthrowntrue();
       print('Error occurred with first option: $error');
+    }
+  }
+
+  void updatedParsePastedLink({String? urli})async{
+    setdownloadProgress(0);
+    final url =
+        'https://instagram-saver-download-anything-on-instagram.p.rapidapi.com/igsanitized';
+    final headers = {
+      'content-type': 'application/x-www-form-urlencoded',
+      'X-RapidAPI-Key': '1b6b87d966msh79911a19efb2892p1e4e0fjsn0e980c80dc71',
+      'X-RapidAPI-Host':
+      'instagram-saver-download-anything-on-instagram.p.rapidapi.com',
+    };
+    final encodedParams = {'url': urli};
+
+    try {
+      runnewMainDownload(urli!);
+      runBackupdownload(urli!);
+    } catch (error) {
+      print("IN Here");
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: encodedParams);
+      print(response.body);
+      parseResponsetoOutput(response.body);
+//      seterrorthrowntrue();
     }
   }
 
@@ -578,7 +633,8 @@ class HomeController extends GetxController {
       linkfieldcontroller.text = value;
       clipboarddata = value;
       String url = value;
-      parsePastedLink(urli: url);
+//      parsePastedLink(urli: url);
+      updatedParsePastedLink(urli: url);
       setloadingtrue();
       confirmLinkValidation();
       update();
@@ -639,39 +695,49 @@ class HomeController extends GetxController {
             },
             child: Container(
                 //  width: 119,
-                width: screenwidth * 0.2895,
+                width: screenwidth * 0.3895,
                 padding: EdgeInsets.symmetric(
                     //           vertical: 9),
-                    vertical: screenwidth * 0.0218),
+                    vertical: screenwidth * 0.0318),
                 decoration: BoxDecoration(
                     color: royalbluethemedcolor,
-                    borderRadius: BorderRadius.all(Radius.circular(14)),
+                    borderRadius: BorderRadius.all(Radius.circular(24)),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withOpacity(0.13),
                           offset: Offset(0, 3),
                           blurRadius: 10)
                     ]),
-                child: Center(
-                  child: Text("Paste Link",
-                      style: TextStyle(
-                          //        fontSize: 16,
-                          fontSize: screenwidth * 0.0389,
-                          color: Colors.white,
-                          fontFamily: proximanovaregular)),
-                ))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(CupertinoIcons.doc_on_clipboard,
+                    color: Colors.white,
+                    size: screenwidth*0.0583,),
+                    Container(
+                      margin: EdgeInsets.only(left: screenwidth*0.034),
+                      child: Text("Paste Link",
+                            style: TextStyle(
+                                //        fontSize: 16,
+                                fontSize: screenwidth * 0.0439,
+                                color: Colors.white,
+                                fontFamily: proximanovaregular)),
+                    ),
+                  ],
+                ),
+                )),
         GestureDetector(
             onTap: () {},
             child: AnimatedContainer(
                 duration: Duration(milliseconds: 200),
                 //      width: 111,
-                width: screenwidth * 0.2700,
+                width: screenwidth * 0.3895,
                 margin: EdgeInsets.only(
                     //        left: 60
-                    left: screenwidth * 0.1459),
+                    left: screenwidth * 0.0459),
                 padding: EdgeInsets.symmetric(
-                    //      vertical: 9
-                    vertical: screenwidth * 0.0218),
+                  //           vertical: 9),
+                    vertical: screenwidth * 0.0318),
                 decoration: BoxDecoration(
                     color:
                         /*  clipboardcontroller.taskss.length==0?
@@ -694,7 +760,7 @@ class HomeController extends GetxController {
                         ? royalbluethemedcolor
                         : */
                         royalbluethemedcolor.withOpacity(0.41),
-                    borderRadius: BorderRadius.all(Radius.circular(14)),
+                    borderRadius: BorderRadius.all(Radius.circular(24)),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withOpacity(0.13),
@@ -706,7 +772,7 @@ class HomeController extends GetxController {
                   "Download",
                   style: TextStyle(
                       //      fontSize: 16,
-                      fontSize: screenwidth * 0.0389,
+                      fontSize: screenwidth * 0.0439,
                       color: Colors.white,
                       fontFamily: proximanovaregular),
                 )))),
@@ -723,18 +789,19 @@ class HomeController extends GetxController {
           bottom: screenwidth * 0.0437),
       padding: EdgeInsets.only(
           //        left: 15
+        top: 2.5,
           left: screenwidth * 0.0364963),
       //    height: 41,
-      height: screenwidth * 0.09975,
+      height: screenwidth * 0.12975,
       width: screenwidth * 0.906,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(11)),
+          borderRadius: BorderRadius.all(Radius.circular(14)),
           border:
               Border.all(color: Color(0xff707070).withOpacity(0.2), width: 1),
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.13),
+                color: Colors.black.withOpacity(0.08),
                 blurRadius: 10,
                 offset: Offset(0, 3))
           ]),
@@ -747,7 +814,7 @@ class HomeController extends GetxController {
         style: TextStyle(
             color: Colors.black,
             //      fontSize: 15,
-            fontSize: screenwidth * 0.0364963,
+            fontSize: screenwidth * 0.042,
             fontFamily: proximanovaregular),
         decoration: InputDecoration(
             suffixIcon: GestureDetector(
@@ -759,7 +826,7 @@ class HomeController extends GetxController {
                 CupertinoIcons.xmark,
                 color: Colors.black87,
                 //      size: 17,
-                size: screenwidth * 0.04136,
+                size: screenwidth * 0.042,
               ),
             ),
             border: InputBorder.none,
@@ -767,7 +834,7 @@ class HomeController extends GetxController {
             hintStyle: TextStyle(
                 color: Colors.black.withOpacity(0.43),
                 //   fontSize: 15,
-                fontSize: screenwidth * 0.0364963,
+                fontSize: screenwidth * 0.042,
                 fontFamily: proximanovaregular)),
       ),
     );
@@ -787,7 +854,7 @@ class HomeController extends GetxController {
       ),
       padding: EdgeInsets.all(
 //          14
-          screenwidth * 0.0340),
+          screenwidth * 0.0460),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -800,7 +867,7 @@ class HomeController extends GetxController {
                   fontFamily: proximanovaregular,
                   color: blackthemedcolor,
                   //    fontSize: 16
-                  fontSize: screenwidth * 0.0366),
+                  fontSize: screenwidth * 0.0426),
             ),
           ),
           Container(
@@ -1004,6 +1071,7 @@ class HomeController extends GetxController {
     String shortCode=extractShortcode(url);
     extractfromBulkScraper(shortCode);
   }
+
   String extractShortcode(String url) {
     // Splitting the URL by '/' and getting the last part
     List<String> parts = url.split('/');
@@ -1034,6 +1102,7 @@ class HomeController extends GetxController {
         parseBackUpResponsetoOutput(response.body);
       } else {
         seterrorthrowntrue();
+        print('Error from bulk scraper');
         print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
@@ -1083,5 +1152,35 @@ class HomeController extends GetxController {
     }*/
     update();
   }
+  void runnewMainDownload(String url){
+    String shortCode=extractShortcode(url);
+    parseFromNewApiStructure(urli:url,shortcode: shortCode);
+  }
 
+  void parseFromNewApiStructure({@required String? urli,@required String? shortcode})async{
+    final Uri url = Uri.parse('https://instagram-saver-download-anything-on-instagram.p.rapidapi.com/post_data');
+    final Map<String, String> headers = {
+      'content-type': 'application/x-www-form-urlencoded',
+      'X-RapidAPI-Key': '1b6b87d966msh79911a19efb2892p1e4e0fjsn0e980c80dc71',
+      'X-RapidAPI-Host': 'instagram-saver-download-anything-on-instagram.p.rapidapi.com',
+    };
+
+    final Map<String, String> body = {
+      //  'shortcode': 'CS8ju3gDkWc',
+      'shortcode': '$shortcode',
+    };
+    final http.Response response = await http.post(
+      url,
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      print(response.body);
+    } else {
+      print('Error: ${response.statusCode}');
+      runBackupdownload(urli!);
+      print(response.body);
+    }
+  }
 }

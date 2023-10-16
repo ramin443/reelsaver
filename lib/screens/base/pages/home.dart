@@ -15,6 +15,7 @@ class Home extends StatelessWidget {
         initState: (v){
 
         },
+
         init: HomeController(),
         builder: (homecontroller){
       return SingleChildScrollView(

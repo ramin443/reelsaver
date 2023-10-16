@@ -93,8 +93,8 @@ class Base extends StatelessWidget {
                         child: SvgPicture.asset(
                           "assets/images/Reels logo SVG.svg",
                           //   height: 42,width: 42,
-                          height: screenWidth * 0.1021,
-                          width: screenWidth * 0.1021,
+                          height: screenWidth * 0.1221,
+                          width: screenWidth * 0.1221,
                         )),
                     title: Container(
                       margin: EdgeInsets.only(
@@ -107,7 +107,7 @@ class Base extends StatelessWidget {
                             fontFamily: proximanovaregular,
                             color: blackthemedcolor,
                             //        fontSize: 18
-                            fontSize: screenWidth * 0.04379),
+                            fontSize: screenWidth * 0.04479),
                       ),
                     ),
                   ),
@@ -122,12 +122,12 @@ class Base extends StatelessWidget {
                     },
                     selectedLabelStyle: TextStyle(
                         fontFamily: proximanovaregular,
-                        fontSize: screenWidth * 0.03041
+                        fontSize: screenWidth * 0.03441
                         //    fontSize: 12.5
                         ),
                     unselectedLabelStyle: TextStyle(
                         fontFamily: proximanovaregular,
-                        fontSize: screenWidth * 0.03041
+                        fontSize: screenWidth * 0.03441
                         //    fontSize: 12.5
                         ),
                     items: [
@@ -135,14 +135,14 @@ class Base extends StatelessWidget {
                           icon: Icon(
                             FeatherIcons.home,
                             //   size: 24,
-                            size: screenWidth * 0.0583,
+                            size: screenWidth * 0.0603,
                           ),
                           label: "Home"),
                       BottomNavigationBarItem(
                         icon: Icon(
                           FeatherIcons.download,
                           //    size: 24,
-                          size: screenWidth * 0.0583,
+                          size: screenWidth * 0.0603,
                         ),
                         label: "Downloads",
                       ),
@@ -150,7 +150,7 @@ class Base extends StatelessWidget {
                           icon: Icon(
                             FeatherIcons.settings,
                             //   size: 24,
-                            size: screenWidth * 0.0583,
+                            size: screenWidth * 0.0603,
                           ),
                           label: "Settings"),
                     ],

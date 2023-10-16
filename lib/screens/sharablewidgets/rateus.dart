@@ -116,7 +116,7 @@ class RateUs extends StatelessWidget {
                               fontFamily: proximanovaregular,
                               color: blackthemedcolor,
                               //    fontSize: 18.5
-                              fontSize:screenwidth*0.0304
+                              fontSize:screenwidth*0.0344
                           ),),
                       ),
                     ],
