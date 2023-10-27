@@ -590,6 +590,8 @@ class HomeController extends GetxController {
       currentFocus.unfocus();
     }
     showdownload = 0;
+    seterrorthrownfalse();
+    setloadingfalse();
     update();
   }
 
