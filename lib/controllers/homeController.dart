@@ -1088,6 +1088,7 @@ class HomeController extends GetxController {
   }
 
   void extractfromBulkScraper(String shortcode) async{
+    print("Shortcode is: $shortcode");
     final String url =
         'https://instagram-bulk-scraper-latest.p.rapidapi.com/webmedia_info_from_shortcode/$shortcode';
 
@@ -1097,7 +1098,10 @@ class HomeController extends GetxController {
     };
     try {
       final response = await http.get(Uri.parse(url), headers: headers);
-      if (response.statusCode == 200) {
+      print('Status code is: ');
+      print(response.statusCode);
+      if (response.statusCode == 200 || response.statusCode == 429) {
+        seterrorthrownfalse();
         //print(response.body);
         parseBackUpResponsetoOutput(response.body);
       } else {
