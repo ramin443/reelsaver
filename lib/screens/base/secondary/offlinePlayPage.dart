@@ -25,7 +25,7 @@ class OfflinePlayPage extends StatelessWidget {
     return
     GetBuilder<VideoPlayController>(
       initState: (v){
-        adcontroller.initializebannerAd();
+        adcontroller.initializevideobannerAd();
         adcontroller.initializeInterstitialAd();
         videoPlayController.initofflinevidplaycontroller(filepath!);
       },
@@ -122,7 +122,7 @@ class OfflinePlayPage extends StatelessWidget {
                       height: 0,
 
                     ),
-                    adcontroller.displayBannerWidget(context),
+                    adcontroller.displayBannerWidgetforVidPlayPage(context),
 
                   ],
                 ),

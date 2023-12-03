@@ -33,6 +33,7 @@ class Base extends StatelessWidget {
               initState: (v) {
                 adcontroller.initializestreams();
                 adcontroller.initializebannerAd();
+                adcontroller.initializevideobannerAd();
                 adcontroller.initializeInterstitialAd();
                 adcontroller.initializeRewardedAd();
               },

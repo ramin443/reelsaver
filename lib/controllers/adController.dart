@@ -10,6 +10,7 @@ import 'package:reelsviddownloader/constants/adconstants.dart';
 
 class AdController extends GetxController{
   BannerAd? bannerAd;
+  BannerAd? vidPlayPagebannerAd;
   InterstitialAd? interstitialAd;
   RewardedAd? rewardedAd;
   int rewardedScore=0;
@@ -59,9 +60,28 @@ class AdController extends GetxController{
     }
   );
 
+  static final BannerAdListener vidplaybannerAdListener = BannerAdListener(
+      onAdLoaded: (ad){
+        print("Ad Loaded");
+      },
+      onAdFailedToLoad: (ad,error){
+        print("Failed to load because $error");
+      },
+      onAdOpened: (ad){
+        print("Ad opened");
+      },
+      onAdClosed: (ad){
+        print("Ad opened");
+      }
+  );
+
   void initializebannerAd()async{
     bannerAd=BannerAd(size: AdSize.fullBanner, adUnitId: banneradunitid,
         listener: bannerAdListener, request: const AdRequest())..load();
+  }
+  void initializevideobannerAd()async{
+    vidPlayPagebannerAd=BannerAd(size: AdSize.fullBanner, adUnitId: vidPlaybanneradunitid,
+        listener: vidplaybannerAdListener, request: const AdRequest())..load();
   }
 
   void initializeInterstitialAd()async{
@@ -149,10 +169,36 @@ class AdController extends GetxController{
         width: screenwidth,
         margin: EdgeInsets.all(0), // No margin
         child: AdWidget(
+          key: UniqueKey(), // Ensure a unique key for each AdWidget
           ad: bannerAd!,
         ),
       ),
     ):SizedBox(height: 0,);
+  }
+  Widget displayBannerWidgetforVidPlayPage(BuildContext context){
+    double screenwidth=MediaQuery.sizeOf(context).width;
+    return
+      showbannerads?
+      bannerAd==null?
+
+      SizedBox(
+        height: 0,
+      ):
+      FloatingActionButton.extended(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.transparent,
+        onPressed: (){},
+        label: Container(
+          height: screenwidth*0.148,
+          width: screenwidth,
+          margin: EdgeInsets.all(0), // No margin
+          child: AdWidget(
+            key: UniqueKey(), // Ensure a unique key for each AdWidget
+            ad: vidPlayPagebannerAd!,
+          ),
+        ),
+      ):SizedBox(height: 0,);
   }
   void fetchbanneradsVal() {
     bannerref.once().then((value) {

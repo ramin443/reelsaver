@@ -29,7 +29,7 @@ class VideoPlayPage extends StatelessWidget {
     GetBuilder<VideoPlayController>(
         init: VideoPlayController(),
         initState: (v) {
-          adcontroller.initializebannerAd();
+          adcontroller.initializevideobannerAd();
           adcontroller.initializeInterstitialAd();
           videoPlayController.initvidplaycontroller(url!);
       //    v.initState();
@@ -127,7 +127,7 @@ class VideoPlayPage extends StatelessWidget {
                           height: 0,
 
                         ),
-                        adcontroller.displayBannerWidget(context),
+                        adcontroller.displayBannerWidgetforVidPlayPage(context),
 
                       ],
                     ),
