@@ -43,7 +43,7 @@ class Base extends StatelessWidget {
 
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.miniCenterFloat,
-                  floatingActionButton: adcontroller.displayBannerWidget(context),
+            //      floatingActionButton: adcontroller.displayBannerWidget(context),
                   appBar: AppBar(
                     elevation: 0,
                     backgroundColor: Colors.transparent,
